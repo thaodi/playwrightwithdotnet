@@ -1,0 +1,56 @@
+name: Playwright Tests & Allure Report
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Cho phép bấm chạy thủ công trên giao diện GitHub
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x' # Hoặc phiên bản .NET bạn đang dùng (ví dụ: 9.0.x / 10.0.x)
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build project
+      run: dotnet build --no-restore
+
+    - name: Install Playwright Browsers & Dependencies
+      run: |
+        dotnet tool install --global Microsoft.Playwright.CLI
+        playwright install --with-deps
+
+    - name: Run NUnit Tests
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Get Allure Report history (Optional)
+      uses: actions/checkout@v4
+      if: always()
+      continue-on-error: true
+
+    - name: Build Allure Report
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      with:
+        allure_results: allure-results
+        allure_report: allure-report
+        keep_reports: 20
+
+    - name: Upload Allure Report Artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report
+        path: allure-report
+        retention-days: 30

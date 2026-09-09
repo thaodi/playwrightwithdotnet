@@ -1,0 +1,38 @@
+[
+  {
+    "TestName": "ValidSignup_StandardUser",
+    "FirstName": "Thao",
+    "LastName": "Nguyen",
+    "Email": "thao.nguyen.test202626@yopmail.com",
+    "Password": "SecurePassword@123",
+    "ConfirmPassword": "SecurePassword@123",
+    "ExpectedResult": "Success"
+  },
+  {
+    "TestName": "InvalidSignup_PasswordMismatch",
+    "FirstName": "Van",
+    "LastName": "An",
+    "Email": "vanan.test@yopmail.com",
+    "Password": "Password123!",
+    "ConfirmPassword": "WrongPassword!",
+    "ExpectedResult": "PasswordConfirmationError"
+  },
+  {
+    "TestName": "InvalidSignup_MissingMandatoryFields",
+    "FirstName": "",
+    "LastName": "",
+    "Email": "",
+    "Password": "",
+    "ConfirmPassword": "",
+    "ExpectedResult": "ValidationErrorEmptyFields"
+  },
+  {
+    "TestName": "InvalidSignup_EmailExists",
+    "FirstName": "Thao",
+    "LastName": "Nguyen",
+    "Email": "thao.nguyen.test2026@yopmail.com",
+    "Password": "SecurePassword@123",
+    "ConfirmPassword": "SecurePassword@123",
+    "ExpectedResult": "ValidationErrorEmailExists"
+  }
+]

@@ -1,0 +1,84 @@
+[
+	{
+		"ProductName": "Automatic Espresso Machine",
+		"ProductPrice": 879.99,
+		"Availability": "In Stock",
+		"Colors": [ "Matte Black", "Silver", "White" ],
+		"DescriptionKeyword": "ceramic grinder",
+		"Properties": {
+			"Warranty": "2 Years",
+			"Wattage": "1400W",
+			"Voltage": "220-240V"
+		},
+		"Details": [
+			{
+				"Color": "Matte Black",
+				"ExpectedSku": "AUTOMATIC-ESPRESSO-MACHINE-MATTE-BLACK",
+				"ExpectedOptionText": "Color: Matte Black"
+			},
+			{
+				"Color": "Silver",
+				"ExpectedSku": "AUTOMATIC-ESPRESSO-MACHINE-SILVER",
+				"ExpectedOptionText": "Color: Silver"
+			},
+			{
+				"Color": "White",
+				"ExpectedSku": "AUTOMATIC-ESPRESSO-MACHINE-WHITE",
+				"ExpectedOptionText": "Color: White"
+			}
+		]
+	},
+	{
+		"ProductName": "Semi-Automatic Espresso Machine",
+		"ProductPrice": 549.99,
+		"Availability": "In Stock",
+		"Colors": [ "Stainless Steel", "Matte Black" ],
+		"DescriptionKeyword": "58mm portafilter, PID temperature control",
+		"Properties": {
+			"Warranty": "2 Years",
+			"Wattage": "1350W",
+			"Voltage": "220-240V"
+		},
+		"Details": [
+			{
+				"Color": "Matte Black",
+				"ExpectedSku": "SEMI-AUTOMATIC-ESPRESSO-MACHINE-MATTE-BLACK",
+				"ExpectedOptionText": "Color: Matte Black"
+			},
+			{
+				"Color": "Stainless Steel",
+				"ExpectedSku": "SEMI-AUTOMATIC-ESPRESSO-MACHINE-STAINLESS-STEEL",
+				"ExpectedOptionText": "Color: Stainless Steel"
+			}
+		]
+	},
+	{
+		"ProductName": "Air Purifier Tower",
+		"ProductPrice": 349.99,
+		"Availability": "In Stock",
+		"Colors": [ "White", "Matte Black", "Steel Grey" ],
+		"DescriptionKeyword": "real-time air quality LED ring",
+		"Properties": {
+			"Warranty": "2 Years",
+			"Wattage": "65W",
+			"Voltage": "220-240V"
+		},
+		"Details": [
+			{
+				"Color": "White",
+				"ExpectedSku": "AIR-PURIFIER-TOWER-WHITE",
+				"ExpectedOptionText": "Color: White"
+			},
+			{
+				"Color": "Matte Black",
+				"ExpectedSku": "AIR-PURIFIER-TOWER-BLACK",
+				"ExpectedOptionText": "Color: Matte Black"
+			},
+			{
+				"Color": "Steel Grey",
+				"ExpectedSku": "AIR-PURIFIER-TOWER-GREY",
+				"ExpectedOptionText": "Color: Steel Grey"
+			}
+		]
+	}
+]
