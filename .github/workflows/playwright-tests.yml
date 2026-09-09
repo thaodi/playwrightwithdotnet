@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Cho phép bấm chạy thủ công trên giao diện GitHub
+  workflow_dispatch:
 
 jobs:
   test:
@@ -18,7 +18,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x' # Hoặc phiên bản .NET bạn đang dùng (ví dụ: 9.0.x / 10.0.x)
+        dotnet-version: '10.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
@@ -29,7 +29,7 @@ jobs:
     - name: Install Playwright Browsers & Dependencies
       run: |
         dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install --with-deps
+        playwright install
 
     - name: Run NUnit Tests
       run: dotnet test --no-build --verbosity normal
