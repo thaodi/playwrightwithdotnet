@@ -3,7 +3,7 @@
     "TestName": "ValidSignup_StandardUser",
     "FirstName": "Thao",
     "LastName": "Nguyen",
-    "Email": "thao.nguyen.test20262601@yopmail.com",
+    "Email": "thao.nguyen.test20262602@yopmail.com",
     "Password": "SecurePassword@123",
     "ConfirmPassword": "SecurePassword@123",
     "ExpectedResult": "Success"
