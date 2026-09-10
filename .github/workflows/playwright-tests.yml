@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "main", "master" ]
   workflow_dispatch:
+  inputs:
+      browser:
+        type: choice
+        description: Which browser to test
+        required: true
+        options:
+          - firefox
+          - chromium
+          - webkit
 
 jobs:
   test:
