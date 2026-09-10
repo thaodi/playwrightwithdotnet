@@ -29,6 +29,14 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.slnx') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Restore dependencies
       run: dotnet restore
 
@@ -62,6 +70,12 @@ jobs:
       if: always()
       run: |
         find . -type d -name "allure-results" -not -path "./allure-results" -exec cp -r {} . \;
+
+    - name: Debug Check Allure Results
+      if: always()
+      run: |
+        echo "Checking allure-results contents:"
+        find allure-results -type f
 
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4
