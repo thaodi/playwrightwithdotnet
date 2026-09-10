@@ -11,8 +11,8 @@ namespace PlaywrightTests.Tests.E2E
         {
             var loginPage = new LoginPage(Page);
             await loginPage.NavigateToLoginPageAsync();
-            await loginPage.LoginAsync("thaodi218@gmail.com", "123456");
-            await loginPage.VerifyLoginSuccessAsync("account", "thaodi218@gmail.com");
+            await loginPage.LoginAsync("thao.nguyen.test202626@yopmail.com", "SecurePassword@123");
+            await loginPage.VerifyLoginSuccessAsync("account", "thao.nguyen.test202626@yopmail.com");
         }
 
         [Test]

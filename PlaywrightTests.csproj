@@ -10,15 +10,17 @@
 
   <ItemGroup>
     <Compile Remove="Pages\NewFolder\**" />
+    <Compile Remove="Utilities\JsonHelper\**" />
+    <Compile Remove="Utilities\LoggerHelper\**" />
     <Compile Remove="Utilities\NewFolder\**" />
     <EmbeddedResource Remove="Pages\NewFolder\**" />
+    <EmbeddedResource Remove="Utilities\JsonHelper\**" />
+    <EmbeddedResource Remove="Utilities\LoggerHelper\**" />
     <EmbeddedResource Remove="Utilities\NewFolder\**" />
     <None Remove="Pages\NewFolder\**" />
+    <None Remove="Utilities\JsonHelper\**" />
+    <None Remove="Utilities\LoggerHelper\**" />
     <None Remove="Utilities\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Utilities\JsonHelper\JsonDataReader.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +47,6 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="Utilities\JsonHelper\" />
   </ItemGroup>
 
   <ItemGroup>

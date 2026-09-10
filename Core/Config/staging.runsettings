@@ -6,7 +6,7 @@
   <TestRunParameters>
     <Parameter name="BaseUrl" value="https://demo.spreecommerce.org/us/en" />
     <Parameter name="Browser" value="chrome" />
-    <Parameter name="Headless" value="true" />
+    <Parameter name="Headless" value="false" />
     <Parameter name="SlowMo" value="2000" />
     <Parameter name="DefaultTimeout" value="30000" />
 	<Parameter name="Environment" value="Staging" />
