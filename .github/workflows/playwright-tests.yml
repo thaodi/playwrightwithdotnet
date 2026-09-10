@@ -41,7 +41,9 @@ jobs:
         playwright install
 
     - name: Run NUnit Tests
-      run: dotnet test
+      run: |
+        mkdir -p allure-results
+        dotnet test
 
     - name: Get Allure Report history
       uses: actions/checkout@v4
