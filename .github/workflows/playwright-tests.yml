@@ -47,6 +47,11 @@ jobs:
         allure_report: allure-report
         keep_reports: 20
 
+    - name: Copy Allure Results to Root
+      if: always()
+      run: |
+        find . -type d -name "allure-results" -not -path "./allure-results" -exec cp -r {} . \;
+
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4
       if: always()
