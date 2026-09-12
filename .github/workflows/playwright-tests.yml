@@ -50,7 +50,6 @@ jobs:
 
     - name: Run NUnit Tests
       run: |
-        mkdir -p allure-results
         dotnet test
 
     - name: Get Allure Report history
@@ -66,16 +65,6 @@ jobs:
         allure_report: allure-report
         keep_reports: 20
 
-    - name: Copy Allure Results to Root
-      if: always()
-      run: |
-        find . -type d -name "allure-results" -not -path "./allure-results" -exec cp -r {} . \;
-
-    - name: Debug Check Allure Results
-      if: always()
-      run: |
-        echo "Checking allure-results contents:"
-        find allure-results -type f
 
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4

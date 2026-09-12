@@ -14,7 +14,6 @@ namespace PlaywrightTests.Tests.E2E.Product
         {
             var productPage = new ProductPage(Page);
             await productPage.NavigateToProductPageAsync();
-            await productPage.ViewAllProduct();
             await productPage.VerifyAllProductIsDisplayedAsync(url: "products", numberOfProducts: 36);
         }
 
@@ -36,7 +35,7 @@ namespace PlaywrightTests.Tests.E2E.Product
                 Assert.That(itemText.Contains(keyword, StringComparison.OrdinalIgnoreCase), Is.True, $"Expected suggestion item to contain '{keyword}', but it doesn't.");
             }
 
-            await productPage.Header.ClickViewAllResultsAsync(keyword);
+            await productPage.Header.ClickViewAllResultsOfProductSearchAsync(keyword);
 
             await Expect(Page).ToHaveURLAsync($"{ConfigReader.BaseUrl}/products?q={keyword}");
             await Expect(productPage.Header.GetSearchResultsHeading(keyword)).ToBeVisibleAsync();
@@ -98,8 +97,8 @@ namespace PlaywrightTests.Tests.E2E.Product
         public async Task TC05_Filter_Products_By_Color(params string[] selectedColors)
         {
             var productPage = new ProductPage(Page);
+            var _productDetailPage = new ProductDetailPage(Page);
             await productPage.NavigateToProductPageAsync();
-            await productPage.ViewAllProduct();
             await productPage.ClickFilterColorButtonAsync();
 
             //Verify the number of color options available
@@ -128,7 +127,7 @@ namespace PlaywrightTests.Tests.E2E.Product
             for (int i = 0; i < productsToCheck; i++)
             {
                 await productPage.ClickProductItemByIndexAsync(i);
-                var colorOnDetailProduct = await productPage.GetAllColorOnDetailProductItemAsync();
+                var colorOnDetailProduct = await _productDetailPage.GetAllColorOnDetailProductItemAsync();
                 Assert.That(colorOnDetailProduct.Any(color => selectedColors.Contains(color)), Is.True, $"Expected product at index {i} to have at least one of the selected colors, but it does not.");
                 await Page.GoBackAsync();
                 await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
@@ -140,8 +139,8 @@ namespace PlaywrightTests.Tests.E2E.Product
         public async Task TC06_Filter_Product_By_Price(string selectedPriceRange)
         {
             var productPage = new ProductPage(Page);
+            var _productDetailPage = new ProductDetailPage(Page);
             await productPage.NavigateToProductPageAsync();
-            await productPage.ViewAllProduct();
             await productPage.ClickPriceButtonAsync();
 
             // Verify the number of price options available
@@ -170,7 +169,7 @@ namespace PlaywrightTests.Tests.E2E.Product
             for (var i = 0; i < productsToCheck; i++)
             {
                 await productPage.ClickProductItemByIndexAsync(i);
-                var priceOnDetailProduct = await productPage.GetPriceOnDetailProductItemAsync();
+                var priceOnDetailProduct = await _productDetailPage.GetPriceOnDetailProductItemAsync();
                 Assert.That(priceOnDetailProduct, Is.GreaterThan(200.00), $"Expected product at index {i} to be within the price range {selectedPriceRange}, but it is not.");
                 await Page.GoBackAsync();
                 await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
@@ -182,8 +181,8 @@ namespace PlaywrightTests.Tests.E2E.Product
         public async Task TC07_Filter_Product_By_Availability(string selectedAvailability, bool hasProductsExpected, int numberOfProductsExpected)
         {
             var productPage = new ProductPage(Page);
+            var _productDetailPage = new ProductDetailPage(Page);
             await productPage.NavigateToProductPageAsync();
-            await productPage.ViewAllProduct();
             await productPage.ClickAvailabilityButtonAsync();
 
             // Verify the number of availability options available
@@ -213,7 +212,7 @@ namespace PlaywrightTests.Tests.E2E.Product
                 for (var i = 0; i < productsToCheck; i++)
                 {
                     await productPage.ClickProductItemByIndexAsync(i);
-                    var availabilityOnDetailProduct = await productPage.GetAvailabilityOnDetailProductItemAsync();
+                    var availabilityOnDetailProduct = await _productDetailPage.GetAvailabilityOnDetailProductItemAsync();
                     Assert.That(availabilityOnDetailProduct.Contains(selectedAvailability), Is.True, $"Expected product at index {i} to be '{selectedAvailability}', but it is not.");
                     await Page.GoBackAsync();
                     await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
@@ -241,14 +240,14 @@ namespace PlaywrightTests.Tests.E2E.Product
         public async Task VerifyViewProductDetail(ProductTestData productData)
         {
             var productPage = new ProductPage(Page);
+            var _productDetailPage = new ProductDetailPage(Page);
             await productPage.NavigateToProductPageAsync();
-            await productPage.ViewAllProduct();
 
             await productPage.ClickProductItemByNameAsync(productData.ProductName);
 
             foreach (var detail in productData.Details)
             {
-                await productPage.SelectColorOnProductDetailAsync(detail.Color);
+                await _productDetailPage.SelectColorOnDetailProductItemAsync(detail.Color);
 
                 var properties = new Dictionary<string, string>
                 {
@@ -259,7 +258,7 @@ namespace PlaywrightTests.Tests.E2E.Product
                     { "Options", detail.ExpectedOptionText }
                 };
 
-                await productPage.VerifyProductDetailDisplayedCorrectly(
+                await _productDetailPage.VerifyProductDetailDisplayedCorrectly(
                     expectedProductName: productData.ProductName,
                     expectedProductPrice: productData.ProductPrice,
                     expectedAvailability: productData.Availability,

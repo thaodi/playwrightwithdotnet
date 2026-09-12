@@ -10,15 +10,13 @@ namespace PlaywrightTests.Pages.Product
     public class ProductPage : BasePage
     {
         public HeaderComponent Header { get; }
+
         public ProductPage(IPage page) : base(page)
         {
             Header = new HeaderComponent(page);
         }
 
-        private ILocator _shopAllBtn => Page.GetByRole(AriaRole.Link, new() { Name = "Shop All" });
-        private ILocator _forkOnGithubBtn => Page.GetByRole(AriaRole.Link, new() { Name = "Fork on GitHub" });
-        private ILocator _quickstartGuide => Page.GetByRole(AriaRole.Link, new() { Name = "Quickstart Guide→" });
-        private ILocator _viewAllLink => Page.GetByRole(AriaRole.Link, new() { Name = "View all →" });
+        #region Locators
         private ILocator _allProductLbl => Page.GetByRole(AriaRole.Heading, new() { Name = "All Products" });
 
         private ILocator _colorBtn => Page.GetByRole(AriaRole.Button, new() { Name = "Color" });
@@ -26,15 +24,11 @@ namespace PlaywrightTests.Pages.Product
         private ILocator _availabilityBtn => Page.GetByRole(AriaRole.Button, new() { Name = "Availability" });
         private ILocator _sortBtn => Page.GetByRole(AriaRole.Button, new() { Name = "Sort" });
         private ILocator _productItems => Page.Locator("//div[contains(@class, 'grid')]//div[contains(@class, 'group relative')]");
+        #endregion
 
         public async Task NavigateToProductPageAsync()
         {
-            await NavigateToAsync("");
-        }
-
-        public async Task ViewAllProduct()
-        {
-            await ClickAsync(_viewAllLink);
+            await NavigateToAsync("/products");
         }
 
         public async Task VerifyAllProductIsDisplayedAsync(string url, int numberOfProducts)
@@ -45,9 +39,26 @@ namespace PlaywrightTests.Pages.Product
             await Expect(_priceBtn).ToBeVisibleAsync();
             await Expect(_availabilityBtn).ToBeVisibleAsync();
             await Expect(_sortBtn).ToBeVisibleAsync();
-            await Expect(_productItems.First).ToBeVisibleAsync();
             await Expect(Page.GetByText($"{numberOfProducts} products")).ToBeVisibleAsync();
+            await Expect(_productItems.First).ToBeVisibleAsync();
         }
+
+        public async Task<bool> IsProductImageVisibleByIndexAsync(int index)
+        {
+            return await _productItems.Locator("//img").Nth(index).IsVisibleAsync();
+        }
+
+        public async Task<string> GetProductNameByIndexAsync(int index)
+        {
+            return await _productItems.Locator("//h3").Nth(index).InnerTextAsync();
+        }
+
+        public async Task<string> GetProductPriceByIndexAsync(int index)
+        {
+            return await _productItems.Locator("//span").Nth(index).InnerTextAsync();
+        }
+
+        #region Sort Filter
         public async Task ClickSortButtonAsync()
         {
             await ClickAsync(_sortBtn);
@@ -99,7 +110,6 @@ namespace PlaywrightTests.Pages.Product
         public async Task<int> OpenSortAndSelectOptionAsync(string sortOption)
         {
             await NavigateToProductPageAsync();
-            await ViewAllProduct();
             await ClickSortButtonAsync();
 
             var count = await GetSortOptionCountAsync();
@@ -107,6 +117,8 @@ namespace PlaywrightTests.Pages.Product
 
             return count;
         }
+        #endregion
+        #region Color Filter
 
         public async Task ClickFilterColorButtonAsync()
         {
@@ -146,6 +158,7 @@ namespace PlaywrightTests.Pages.Product
             }
             return tagTexts;
         }
+        #endregion
 
         public async Task<int> GetProductResultCountAsync()
         {
@@ -179,20 +192,7 @@ namespace PlaywrightTests.Pages.Product
             await ClickAsync(productItemLocator);
         }
 
-        public async Task<List<string>> GetAllColorOnDetailProductItemAsync()
-        {
-            var colorProductItemLocator = Page.Locator("button[title]");
-            var count = await colorProductItemLocator.CountAsync();
-            var colorProductItemTexts = new List<string>();
-            for(int i = 0; i < count; i++)
-            {
-                var text = await colorProductItemLocator.Nth(i).GetAttributeAsync("title");
-                colorProductItemTexts.Add(text.Trim());
-            }
-            
-            return colorProductItemTexts;
-        }
-
+        #region Price Filter
         public async Task ClickPriceButtonAsync()
         {
             await ClickAsync(_priceBtn);
@@ -228,18 +228,7 @@ namespace PlaywrightTests.Pages.Product
             var priceTagLocator = Page.GetByText($"Price: {selectedPriceRanges}");
             return await priceTagLocator.InnerTextAsync();
         }
-
-        public async Task<decimal> GetPriceOnDetailProductItemAsync()
-        {
-            var priceProductItemLocator = Page.Locator("h1 + div span").First;
-            var priceProductItemText = await priceProductItemLocator.InnerTextAsync();
-            var match = Regex.Match(priceProductItemText, @"[\d.]+");
-            if(match.Success && decimal.TryParse(match.Value, out decimal price))
-            {
-                return price;
-            }
-            return 0;
-        }
+        #endregion
 
         #region Availability Filter
         public async Task ClickAvailabilityButtonAsync()
@@ -284,51 +273,6 @@ namespace PlaywrightTests.Pages.Product
             return await availabilityTagLocator.InnerTextAsync();
         }
 
-        public async Task<string> GetAvailabilityOnDetailProductItemAsync()
-        {
-            var availabilityProductItemLocator = Page.Locator("h1 + div + div span").First;
-            var availabilityProductItemText = await availabilityProductItemLocator.InnerTextAsync();
-            return availabilityProductItemText.Trim();
-        }
         #endregion
-
-        public async Task VerifyProductDetailDisplayedCorrectly(string expectedProductName, decimal expectedProductPrice, string expectedAvailability, string[] expectedColors, string expectedDescription, Dictionary<string, string> expectedProperties)
-        {
-            var expectedSlug = expectedProductName.ToLower().Replace(" ", "-");
-            await Expect(Page).ToHaveURLAsync($"{ConfigReader.BaseUrl}/products/{expectedSlug}");
-
-            //Verify product name, price, and availability
-            var productName = await Page.GetByRole(AriaRole.Heading, new() { Name = $"{expectedProductName}" }).First.InnerTextAsync();
-            Assert.That(productName, Is.EqualTo(expectedProductName), $"Expected product name: {expectedProductName}, but got: {productName}");
-
-            var productPrice = await GetPriceOnDetailProductItemAsync();    
-            Assert.That(productPrice, Is.EqualTo(expectedProductPrice), $"Expected price: {expectedProductPrice}, but got: {productPrice}");
-
-            var actualAvailability = await GetAvailabilityOnDetailProductItemAsync();
-            Assert.That(actualAvailability, Is.EqualTo(expectedAvailability), $"Expected availability: {expectedAvailability}, but got: {actualAvailability}");
-
-            var colorOnDetailProduct = await GetAllColorOnDetailProductItemAsync();
-            Assert.That(colorOnDetailProduct, Is.EquivalentTo(expectedColors), $"Expected colors: {string.Join(", ", expectedColors)}, but got: {string.Join(", ", colorOnDetailProduct)}");
-
-            var descriptionLocator = Page.Locator("h2 + div").First;
-            var actualDescription = await descriptionLocator.InnerTextAsync();
-            Assert.That(actualDescription, Does.Contain(expectedDescription), $"Expected description: {expectedDescription}, but got: {actualDescription}");
-
-            foreach (var prop in expectedProperties)
-            {
-                var propKeyLocator = Page.Locator($"text={prop.Key}").First;
-                var propValueLocator = Page.Locator($"text={prop.Value}").First;
-
-                await propKeyLocator.ScrollIntoViewIfNeededAsync();
-                await Expect(propKeyLocator).ToBeVisibleAsync();
-                await Expect(propValueLocator).ToBeVisibleAsync();
-            }
-        }
-
-        public async Task SelectColorOnProductDetailAsync(string color)
-        {
-            var colorProductItemLocator = Page.Locator($"button[title='{color}']");
-            await ClickAsync(colorProductItemLocator);
-        }
     }
 }

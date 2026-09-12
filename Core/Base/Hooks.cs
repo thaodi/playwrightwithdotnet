@@ -1,29 +1,38 @@
-using Allure.Net.Commons;
+﻿using Allure.Net.Commons;
 using Microsoft.Playwright;
-using NUnit.Framework.Interfaces;
 using PlaywrightTests.Core.Config;
 using PlaywrightTests.Core.Driver;
 using PlaywrightTests.Utilities;
+using Reqnroll;
 
+//[assembly: LevelOfParallelism(2)]
+//[assembly: Parallelizable(ParallelScope.All)]
 namespace PlaywrightTests.Core.Base
 {
-    [TestFixture]
-    public abstract class BaseTest
+    [Binding]
+    public class Hooks
     {
-        protected IPlaywright PlaywrightInstance { get; private set; } = null!;
-        protected IBrowser Browser { get; private set; } = null!;
+        protected static IPlaywright PlaywrightInstance { get; private set; } = null!;
+        protected static IBrowser Browser { get; private set; } = null!;
         protected IBrowserContext Context { get; private set; } = null!;
         protected IPage Page { get; private set; } = null!;
+        private readonly ScenarioContext _scenarioContext;
 
-        [OneTimeSetUp]
-        public void SetupEnvironmentProperties()
+        public Hooks(ScenarioContext scenarioContext)
         {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, "../../../.."));
-            var allureResultsDir = Path.Combine(projectRoot, "allure-results");
-            Directory.CreateDirectory(allureResultsDir);
-            Environment.SetEnvironmentVariable("ALLURE_RESULTS_DIRECTORY", allureResultsDir);
+            _scenarioContext = scenarioContext;
+        }
 
+        [BeforeTestRun]
+        public static async Task BeforeTestRun()
+        {
+            var allureResultsDir = Path.Combine(Directory.GetCurrentDirectory(), "allure-results");
+
+            if (Directory.Exists(allureResultsDir))
+            {
+                Directory.Delete(allureResultsDir, true);
+            }
+            Directory.CreateDirectory(allureResultsDir);
             var envPropertiesPath = Path.Combine(allureResultsDir, "environment.properties");
             var lines = new[]
             {
@@ -35,16 +44,22 @@ namespace PlaywrightTests.Core.Base
             };
 
             File.WriteAllLines(envPropertiesPath, lines);
-        }
 
-        [SetUp]
-        public async Task GlobalSetup()
-        {
             var testName = TestContext.CurrentContext.Test.Name;
             LoggerHelper.Info($"=== STARTING TEST: {testName} ===");
 
             PlaywrightInstance = await Playwright.CreateAsync();
             Browser = await PlaywrightFactory.CreateBrowserAsync(PlaywrightInstance);
+
+            // Do not create a shared Context/Page here. Create per-scenario contexts in BeforeScenario.
+        }
+
+        [BeforeScenario]
+        public async Task BeforeScenario()
+        {
+            var scenarioName = _scenarioContext.ScenarioInfo.Title;
+            LoggerHelper.Info($"=== STARTING SCENARIO: {scenarioName} ===");
+
             Context = await PlaywrightFactory.CreateBrowserContextAsync(Browser);
 
             await Context.Tracing.StartAsync(new TracingStartOptions
@@ -56,27 +71,28 @@ namespace PlaywrightTests.Core.Base
 
             Page = await Context.NewPageAsync();
             Page.SetDefaultTimeout(ConfigReader.DefaultTimeout);
+
+            _scenarioContext.Set(Page, "Page");
         }
 
-        [TearDown]
-        public async Task GlobalTeardown()
+        [AfterScenario]
+        public async Task AfterScenario()
         {
-            var testName = TestContext.CurrentContext.Test.Name;
-            var testStatus = TestContext.CurrentContext.Result.Outcome.Status;
-            var errorMessage = TestContext.CurrentContext.Result.Message;
+            var scenarioName = _scenarioContext.ScenarioInfo.Title;
+            var errorMessage = _scenarioContext.TestError;
 
-            if (testStatus == TestStatus.Failed)
+            if (errorMessage != null)
             {
-                LoggerHelper.Error($"TEST FAILED/ERROR: {testName}. Reason: {errorMessage}");
+                LoggerHelper.Error($"TEST FAILED/ERROR: {scenarioName}. Reason: {errorMessage}");
 
                 if (Page != null)
                 {
                     try
                     {
-                        var screenshotBytes = await Page.ScreenshotAsync(new PageScreenshotOptions {});
+                        var screenshotBytes = await Page.ScreenshotAsync(new PageScreenshotOptions { });
                         AllureApi.AddAttachment("Failure Screenshot", "image/png", screenshotBytes);
 
-                        var tracePath = Path.Combine("TestResults", $"trace_{testName}.zip");
+                        var tracePath = Path.Combine("TestResults", $"trace_{scenarioName}.zip");
                         await Context.Tracing.StopAsync(new TracingStopOptions { Path = tracePath });
                         AllureApi.AddAttachment("Playwright Trace", "application/zip", tracePath);
 
@@ -94,7 +110,7 @@ namespace PlaywrightTests.Core.Base
             }
             else
             {
-                LoggerHelper.Info($"TEST PASSED: {testName}");
+                LoggerHelper.Info($"TEST PASSED: {scenarioName}");
                 if (Context != null)
                 {
                     await Context.Tracing.StopAsync(new TracingStopOptions());
@@ -102,6 +118,11 @@ namespace PlaywrightTests.Core.Base
             }
 
             if (Context != null) await Context.CloseAsync();
+        }
+
+        [AfterTestRun]
+        public static async Task AfterTestRun()
+        {
             if (Browser != null) await Browser.CloseAsync();
             PlaywrightInstance?.Dispose();
         }

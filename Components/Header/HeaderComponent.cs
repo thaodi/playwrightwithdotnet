@@ -73,7 +73,6 @@ namespace PlaywrightTests.Components.Header
 			return autoSelectedLanguage;
 		}
 
-
 		public async Task SearchProductAsync(string keyword)
 		{
             await ClickAsync(_btnSearch);
@@ -92,7 +91,7 @@ namespace PlaywrightTests.Components.Header
 			return await GetTextAsync(suggestionItems.Nth(index));
         }
 
-        public async Task ClickViewAllResultsAsync(string keyword)
+        public async Task ClickViewAllResultsOfProductSearchAsync(string keyword)
         {
             var viewAllResultBtn = Page.GetByRole(AriaRole.Button, new() { Name = $"View all results for \"{keyword}\"" });
             await viewAllResultBtn.ClickAsync();

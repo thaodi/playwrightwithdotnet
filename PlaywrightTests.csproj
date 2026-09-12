@@ -24,18 +24,31 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Home\HomePage.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\IT\.nuget\packages\allure.reqnroll\2.15.0\contentFiles\any\netstandard2.0\allureConfig.Template.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Components\Header\HeaderComponent.cs" />
+    <None Include="Pages\Home\HomePage.cs" />
     <None Include="Utilities\JsonDataReader.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Allure.NUnit" Version="2.15.0" />
+    <PackageReference Include="Allure.Net.Commons" Version="2.15.0" />
+    <PackageReference Include="Allure.Reqnroll" Version="2.15.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.61.0" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Reqnroll" Version="3.3.4" />
+    <PackageReference Include="Reqnroll.NUnit" Version="3.3.4" />
+    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="3.3.4" />
     <PackageReference Include="Serilog" Version="4.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
@@ -47,12 +60,13 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Tests\Smoke\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="allureconfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+<ItemGroup>
+	<None Update="allureconfig.json">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+</ItemGroup>
 
 </Project>
